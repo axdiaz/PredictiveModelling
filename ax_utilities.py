@@ -5,7 +5,7 @@ import numpy as np
 def data_quality_report(data):
     # List of database variables
     cols = pd.DataFrame(
-        list(data.columns.values), columns=["Names"], index=list(data.columns.values)
+        list(data.columns.values), index=list(data.columns.values)
     )
     # List of data types
     dtyp = pd.DataFrame(data.dtypes, columns=["Type"])
@@ -16,16 +16,17 @@ def data_quality_report(data):
     # List of unique values
     unival = pd.DataFrame(columns=["Unique_values"])
     # List of min values
-    minval = pd.DataFrame(columns=["Min value"])
+    minval = pd.DataFrame(columns=["Min_value"])
     # List of max values
     maxval = pd.DataFrame(columns=["Max_value"])
     for col in list(data.columns.values):
         unival.loc[col] = [data[col].nunique()]
-        if pd.api.types.is_numeric_dtype(data.dtypes[col]):
+        if not pd.api.types.is_numeric_dtype(data.dtypes[col]):
+            minval.loc[col] = [None]
+            maxval.loc[col] = [None]
+        else:
             minval.loc[col] = [data[col].min()]
             maxval.loc[col] = [data[col].max()]
-        else:
-            pass
     # Join the tables and return the result
     return (
         cols.join(dtyp)
