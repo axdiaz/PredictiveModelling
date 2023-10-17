@@ -88,6 +88,31 @@ plt.grid()
 plt.show()
 # fig.savefig('../figures/P1_fig/F3.png')
 
+# %% Spatial sign transformation to mitigate outliers
+tmp = data[["Refractive_index_scale", "Na_scale"]]
+# modulo = np.sqrt(np.sum(tmp*tmp,axis=1))
+# tmp['Refractive_index_scale'] = tmp['Refractive_index_scale']/modulo
+# tmp['Na_scale'] = tmp['Na_scale']/modulo
+# plt.scatter(tmp.Refractive_index_scale,tmp.Na_scale)
+
+# Using scikit-learn
+from sklearn import preprocessing
+
+tmp = preprocessing.normalize(np.array(tmp), norm="l2")
+fig = plt.figure(figsize=(9, 5))
+plt.subplot(1, 2, 1)
+plt.scatter(data["Refractive_index_scale"][outliers], data["Na_scale"][outliers], c="r")
+plt.scatter(data["Refractive_index_scale"][~outliers], data["Na_scale"][~outliers])
+plt.xlabel("Refractive_index_scale"), plt.ylabel("Na_scale")
+plt.subplot(1, 2, 2)
+plt.scatter(tmp[outliers, 0], tmp[outliers, 1], c="r")
+plt.scatter(tmp[~outliers, 0], tmp[~outliers, 1])
+plt.xlabel("Refractive_index_scale"), plt.ylabel("Na_scale")
+plt.tight_layout()
+plt.show()
+# fig.savefig('../figures/P1_fig/F8.png')
+
+
 # %% SCALING OF VARIABLES BY NORMALIZATION
 data["Refractive_index_scale"] = (
     data.Refractive_index - data.Refractive_index.mean()
@@ -221,31 +246,6 @@ outliers = np.where(
     np.where(data["Refractive_index"] < lmin, True, False),
 )
 outliers_df = data.loc[outliers, "Refractive_index"]
-
-# %% Spatial sign transformation to mitigate outliers
-tmp = data[["Refractive_index_scale", "Na_scale"]]
-# modulo = np.sqrt(np.sum(tmp*tmp,axis=1))
-# tmp['Refractive_index_scale'] = tmp['Refractive_index_scale']/modulo
-# tmp['Na_scale'] = tmp['Na_scale']/modulo
-# plt.scatter(tmp.Refractive_index_scale,tmp.Na_scale)
-
-# Using scikit-learn
-from sklearn import preprocessing
-
-tmp = preprocessing.normalize(np.array(tmp), norm="l2")
-fig = plt.figure(figsize=(9, 5))
-plt.subplot(1, 2, 1)
-plt.scatter(data["Refractive_index_scale"][outliers], data["Na_scale"][outliers], c="r")
-plt.scatter(data["Refractive_index_scale"][~outliers], data["Na_scale"][~outliers])
-plt.xlabel("Refractive_index_scale"), plt.ylabel("Na_scale")
-plt.subplot(1, 2, 2)
-plt.scatter(tmp[outliers, 0], tmp[outliers, 1], c="r")
-plt.scatter(tmp[~outliers, 0], tmp[~outliers, 1])
-plt.xlabel("Refractive_index_scale"), plt.ylabel("Na_scale")
-plt.tight_layout()
-plt.show()
-# fig.savefig('../figures/P1_fig/F8.png')
-
 
 # %% APPLICATION OF PCA TO DATA
 from sklearn.decomposition import PCA
